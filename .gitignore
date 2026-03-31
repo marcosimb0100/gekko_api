@@ -1,0 +1,12 @@
+/env
+
+notes.md
+.env
+
+**/__pycache__/
+*.pyc
+*.egg
+
+# Entornos virtuales
+env/
+.env/
