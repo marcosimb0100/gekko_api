@@ -3,13 +3,13 @@ from os import path, makedirs
 import os
 import time
 
-def archivoRuta(dir, fileReq):
+def archivoRuta(dir, fileReq, id):
     
     # ========== Crear nuevo nombre para el archivo ==========
     dateTime = datetime.now()
     f = fileReq
     extension = f".{f.filename.split('.')[len(f.filename.split('.'))-1]}"
-    fileNameNew = f"{str(time.mktime(dateTime.timetuple())).replace('.0', '')}{extension}"
+    fileNameNew = f"{id}_{str(time.mktime(dateTime.timetuple())).replace('.0', '')}{extension}"
     
     # ========== Ruta principal ==========
     rootRoute = path.dirname(path.abspath(__file__))

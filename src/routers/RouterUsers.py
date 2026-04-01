@@ -85,6 +85,24 @@ def get_foto():
         return jsonify({'mensaje': str(ex), 'datos': {}}), 500
     
     
+
+@main.route('/foto/<id>', methods=['GET'])
+def get_foto_id(id):
+    has_access = Seguridad.verificar_token(request.headers)
+    if not has_access['status'] == 200:
+        return jsonify(has_access['data']), has_access['status']
+    try:
+        resultado = UsuarioHelper.mostrar_foto_perfil(id)
+        route = enviarArchivo( f"\\upload\\profiles\\{resultado}" )
+        if path.isfile( route ):
+            return send_file( route )
+        else:
+            route = enviarArchivo( f"\\files\\profile_photos\\perfil.png" )
+            return send_file( route )
+    except Exception as ex:
+        return jsonify({'mensaje': str(ex), 'datos': {}}), 500
+    
+    
     
     
 @main.route('/usuarios', methods=['GET'])

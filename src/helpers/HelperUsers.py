@@ -178,9 +178,9 @@ class UsuarioHelper():
             
             fecha_actualizacion                 = datetime.now()
             db                                  = cnn_mongo()
-            ruta, archivoFoto                   = archivoRuta( "\\upload\\profiles\\", imagen['foto_perfil'] )
+            ruta, archivoFoto                   = archivoRuta( "\\upload\\profiles\\", imagen['foto_perfil'], id )
             usuario_actualizado = {
-                "foto_perfil": archivoFoto,
+                "foto_perfil": f"{archivoFoto}",
                 "fecha_actualizacion": fecha_actualizacion
             }
             respDB = db["usuarios"].update_one(
