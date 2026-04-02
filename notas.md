@@ -18,3 +18,9 @@
     python3 -m venv dev
 
     source dev/bin/activate
+
+    python3 src/server.py
+
+            paquete install
+    -- pip freeze > requirements.txt
+    -- pip install -r requirements.txt
