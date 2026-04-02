@@ -9,3 +9,12 @@
     -- python setup.py install
     
     -- py .\src\server.py
+
+
+
+
+    linux
+
+    python3 -m venv dev
+
+    source dev/bin/activate
