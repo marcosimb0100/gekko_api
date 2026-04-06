@@ -6,7 +6,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "7507:7507"
+      - "7508:7508"
     environment:
       PYTHONUNBUFFERED: "1"
       TZ: America/Mexico_City
