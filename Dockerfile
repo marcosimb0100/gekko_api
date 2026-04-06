@@ -25,6 +25,6 @@ RUN pip install -r /app/requirements.txt
 COPY . /app
 
 # Si tu proyecto tiene pyproject.toml/setup.cfg, puedes dejarlo editable:
-RUN pip install -e .
+# RUN pip install -e .
 
 CMD ["python", "./src/server.py"]
