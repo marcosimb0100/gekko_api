@@ -4,12 +4,15 @@ from typing import Optional
 from datetime import datetime
 
 
-class UsuarioModel(BaseModel):
+class EmailModel(BaseModel):
 
     correo_electronico: str
-    nombre_completo: str
     clave: str
-    foto_perfil: Optional[str] = None
+    servidor_entrante: str
+    puerto_imap: str
+    puerto_pop3: str
+    servidor_saliente: str
+    puerto_smtp: str
 
     id_usuario_creo: Optional[str] = None
     id_usuario_modifico: Optional[str] = None

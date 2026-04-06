@@ -9,9 +9,9 @@ main = Blueprint('usuarios_blueprint', __name__)
 
 @main.route('/', methods=['POST'])
 def post_usuario():
-    # has_access = Seguridad.verificar_token(request.headers)
-    # if not has_access['status'] == 200:
-    #     return jsonify(has_access['data']), has_access['status']
+    has_access = Seguridad.verificar_token(request.headers)
+    if not has_access['status'] == 200:
+        return jsonify(has_access['data']), has_access['status']
     try:
         datos = request.get_json()
         resultado = UsuarioHelper.crear( datos )
@@ -22,12 +22,12 @@ def post_usuario():
         
 @main.route('/', methods=['PUT'])
 def put_usuario():
-#     has_access = Seguridad.verificar_token(request.headers)
-#     if not has_access['status'] == 200:
-#         return jsonify(has_access['data']), has_access['status']
+    has_access = Seguridad.verificar_token(request.headers)
+    if not has_access['status'] == 200:
+        return jsonify(has_access['data']), has_access['status']
     try:
         datos = request.get_json()
-        resultado = UsuarioHelper.actualizar(datos)  
+        resultado = UsuarioHelper.actualizar( request.id_usuario, datos )
         return jsonify(resultado['data']), resultado['status']
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'datos': {}}), 500

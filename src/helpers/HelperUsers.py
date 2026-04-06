@@ -5,16 +5,28 @@ from helpers.HelperFile import archivoRuta
 from datetime import datetime
 from bson import ObjectId
 import bcrypt
-import shortuuid
 
 from models.ModelUsers import UsuarioModel
 
 class UsuarioHelper():
     
+    # @staticmethod
+    # def formatear_clave(clave):
+    #     return clave.replace('_', ' ').title()
+    
+    @staticmethod
+    def formatear_diccionario(datos):
+        return {
+            k.replace('_', ' ').title(): v
+            for k, v in datos.items()
+            if k != '_id'
+        }
+
+
     @classmethod
     def crear(self, datos):
         try:
-            
+
             fecha_actual                        = datetime.now()
             sal                                 = bcrypt.gensalt()
             clave                               = datos['clave']
@@ -48,38 +60,71 @@ class UsuarioHelper():
         
         
     @classmethod
-    def actualizar(self, datos):
+    def actualizar(self, idUsuario, datos):
         try:
 
             fecha_actualizacion                 = datetime.now()
             db                                  = cnn_mongo()
-            usuario_actualizado = {
+            
+            if db["usuarios"].find_one({ "correo_electronico": datos['correo_electronico'], "_id": { "$ne": ObjectId(datos['_id']) } }):
+                resultado = { 'status': 400, "data": { 'mensaje': 'El correo electrónico ya existe.', 'datos': {} } }
+                return resultado
+            
+            if datos['cambiar_clave']:
                 
-                "correo_electronico": datos['correo_electronico'].lower(), 
-                "nombre_completo": datos['nombre_completo'].upper(), 
+                sal                             = bcrypt.gensalt()
+                clave                           = datos['clave']
+                clave_hashed                    = bcrypt.hashpw(clave.encode('utf-8'), sal)
+                clave_hashed_str                = clave_hashed.decode('utf-8')
                 
-                "activo": self.str_to_bool(datos['activo']),
+                usuario_actualizado = {
+                    
+                    "nombre_completo": str(datos['nombre_completo']),
+                    "correo_electronico": str(datos['correo_electronico']),
+                    "clave": str(clave_hashed_str),
+                    
+                    "id_usuario_modifico": idUsuario,
+
+                    "activo": datos['activo'],
+                    
+                    "fecha_actualizacion": fecha_actualizacion,
+                    "fecha_inactivo": fecha_actualizacion if not datos['activo'] else None
+                    
+                }
+            else:
                 
-                "fecha_actualizacion": fecha_actualizacion,
-                "fecha_inactivo": fecha_actualizacion if not self.str_to_bool(datos['activo']) else None
-                
-            }
+                usuario_actualizado = {
+                    
+                    "nombre_completo": str(datos['nombre_completo']),
+                    "correo_electronico": str(datos['correo_electronico']),
+                    
+                    "id_usuario_modifico": idUsuario,
+
+                    "activo": datos['activo'],
+                    
+                    "fecha_actualizacion": fecha_actualizacion,
+                    "fecha_inactivo": fecha_actualizacion if not datos['activo'] else None
+                    
+                }
+            
             respDB = db["usuarios"].update_one(
-                { "id_usuario": datos['id_usuario'] },  
+                { "_id": ObjectId(datos['_id']) },
                 { "$set": usuario_actualizado }
             )
             
             if respDB.modified_count > 0:
+                # nuevo = UsuarioHelper.formatear_diccionario(datos)
+                # print(nuevo)
                 resultado = { 'status': 200, "data": { 'mensaje': 'Actualización correcta!', 'datos': {} } }
             else:
                 resultado = { 'status': 400, "data": { 'mensaje': 'La actualización falló.', 'datos': {} } }
             
             return resultado
         except Exception as ex:
+            print(str(ex))
             return { 'status': 500, "data": { 'mensaje': str(ex), 'datos': {} } }
-        
-        
-        
+
+
     @classmethod
     def clave(self, datos):
         try:

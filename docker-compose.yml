@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    container_name: gekko_api
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "7507:7507"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      TZ: America/Mexico_City
+    restart: always
+    command: python ./src/server.py

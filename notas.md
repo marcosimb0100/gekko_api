@@ -24,3 +24,16 @@
             paquete install
     -- pip freeze > requirements.txt
     -- pip install -r requirements.txt
+
+
+
+
+
+Datos servidor
+Username:	            notificaciones@ballfudr.com.mx
+Contraseña:	            MYaIzs_lEji++6d{
+Incoming Server:	    moluk.hosting-mexico.net
+IMAP Port:              993
+POP3 Port:              995
+Outgoing Server:	    moluk.hosting-mexico.net
+SMTP Port:              465
