@@ -69,3 +69,20 @@ def put_logo(rfc):
         return jsonify(resultado['data']), resultado['status']
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'datos': {}}), 500
+    
+    
+@main.route('/foto/<id>', methods=['GET'])
+def get_logo(id):
+    has_access = Seguridad.verificar_token(request.headers)
+    if not has_access['status'] == 200:
+        return jsonify(has_access['data']), has_access['status']
+    try:
+        resultado = CompanyHelper.logo_compania(id)
+        route = enviarArchivo( f"\\upload\\companies\\{resultado["rfc"]}\\{resultado["logo"]}" )
+        if path.isfile( route ):
+            return send_file( route )
+        else:
+            route = enviarArchivo( f"\\files\\profile_photos\\perfil.png" )
+            return send_file( route )
+    except Exception as ex:
+        return jsonify({'mensaje': str(ex), 'datos': {}}), 500

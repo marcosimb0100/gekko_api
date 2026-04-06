@@ -425,3 +425,12 @@ class CompanyHelper():
             print(str(ex))
             return { 'status': 500, "data": { 'mensaje': str(ex), 'datos': {} } }
 
+
+    @classmethod
+    def logo_compania(self, id):
+        try:
+            db                                  = cnn_mongo()
+            logo_compania                       = db["companias"].find_one({ "_id": ObjectId(id) })
+            return logo_compania
+        except Exception as ex:
+            return str(ex)
