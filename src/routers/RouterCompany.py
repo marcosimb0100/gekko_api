@@ -71,7 +71,7 @@ def put_logo(rfc):
         return jsonify({'mensaje': str(ex), 'datos': {}}), 500
     
     
-@main.route('/foto/<id>', methods=['GET'])
+@main.route('/logo/<id>', methods=['GET'])
 def get_logo(id):
     has_access = Seguridad.verificar_token(request.headers)
     if not has_access['status'] == 200:
