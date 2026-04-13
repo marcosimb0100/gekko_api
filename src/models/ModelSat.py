@@ -69,3 +69,15 @@ class SatBancoModel(BaseModel):
     class Config:
         json_encoders = {ObjectId: str}
         populate_by_name = True
+
+
+class SatProductosServiciosModel(BaseModel):
+
+    tipo_clave_prod_serv: str
+    tipo: str
+    clave_prod_serv: str
+    descripcion: str    
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        populate_by_name = True

@@ -14,3 +14,15 @@ def get_sat_empresa():
         return jsonify(resultado['data']), resultado['status']
     except Exception as ex:
         return jsonify({'mensaje': str(ex), 'datos': {}}), 500
+    
+    
+@main.route('/sat_productos_servicios/<dato>', methods=['GET'])
+def sat_productos_servicios(dato):
+    has_access = Seguridad.verificar_token(request.headers)
+    if not has_access['status'] == 200:
+        return jsonify(has_access['data']), has_access['status']
+    try:
+        resultado = SatHelper.catalogos_filtro_producto_servicio(dato)
+        return jsonify(resultado['data']), resultado['status']
+    except Exception as ex:
+        return jsonify({'mensaje': str(ex), 'datos': {}}), 500
