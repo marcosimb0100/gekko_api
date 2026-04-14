@@ -1,5 +1,5 @@
 from dataBase.mongo import cnn_mongo
-from models.ModelCompany import CompanyModel, BankCompanyModel
+from models.ModelCompany import CompanyModel, BankCompanyModel, ProdServModel
 from helpers.HelperSecurity import Seguridad
 from helpers.HelperFile import archivoRuta
 from datetime import datetime
@@ -69,6 +69,7 @@ class CompanyHelper():
                 
             )
             respDB = db["companias"].insert_one(compania.dict(by_alias=True))
+
             
             if respDB.inserted_id:
                 
@@ -91,6 +92,28 @@ class CompanyHelper():
 
                     resp_banco = db["companias_bancos"].insert_one(banco.dict(by_alias=True))
                     bancos_insertados.append(str(resp_banco.inserted_id))
+
+
+                prod_serv_list = datos.get("prod_serv", [])
+                prod_serv_insertados = []
+
+                for item in prod_serv_list:
+                    prod_serv = ProdServModel(
+                        company_id=company_id,
+                        prod_serv=(item.get("prod_serv") or "").upper(),
+                        descripcion_sat=(item.get("descripcion_sat") or "").upper(),
+                        descripcion=(item.get("descripcion") or "").upper(),
+                        clave_unidad=(item.get("clave_unidad") or "").upper(),
+                        unidad=(item.get("unidad") or "").upper(),
+                        objeto_imp=(item.get("objeto_imp") or "").upper(),
+                        id_usuario_creo=idUsuario,
+                        activo=item.get("activo", True),
+                        fecha_creacion=fecha_actual,
+                        fecha_inactivo=fecha_actual if not item.get("activo", True) else None
+                    )
+
+                    resp_prod_serv = db["companias_prod_serv"].insert_one(prod_serv.dict(by_alias=True))
+                    prod_serv_insertados.append(str(resp_prod_serv.inserted_id))
 
                 
                 resultado = { 'status': 200, "data": { 'mensaje': 'Inserción correcta!', 'datos': {} } }
@@ -220,6 +243,56 @@ class CompanyHelper():
                     resp_banco = db["companias_bancos"].insert_one(nuevo_banco)
                     bancos_insertados.append(str(resp_banco.inserted_id))
 
+
+            prod_serv_list = datos.get("prod_serv", [])
+            prod_serv_actualizados = []
+            prod_serv_insertados = []
+
+            for item in prod_serv_list:
+                prod_serv_id = item.get("_id")
+
+                update_prod_serv = {
+                    "company_id": company_id,
+                    "prod_serv": (item.get("prod_serv") or "").upper(),
+                    "descripcion_sat": (item.get("descripcion_sat") or "").upper(),
+                    "descripcion": (item.get("descripcion") or "").upper(),
+                    "clave_unidad": (item.get("clave_unidad") or "").upper(),
+                    "unidad": (item.get("unidad") or "").upper(),
+                    "objeto_imp": item.get("num_uso"),
+                    "num_uso": item.get("num_uso"),
+                    "id_usuario_modifico": idUsuario,
+                    "activo": item.get("activo", True),
+                    "fecha_actualizacion": fecha_actual,
+                    "fecha_inactivo": fecha_actual if not item.get("activo", True) else None
+                }
+
+                if prod_serv_id:
+                    db["companias_prod_serv"].update_one(
+                        {
+                            "_id": ObjectId(prod_serv_id),
+                            "company_id": company_id
+                        },
+                        {"$set": update_prod_serv}
+                    )
+                    prod_serv_actualizados.append(prod_serv_id)
+                else:
+                    nuevo_prod_serv = {
+                        "company_id": company_id,
+                        "prod_serv": (item.get("prod_serv") or "").upper(),
+                        "descripcion_sat": (item.get("descripcion_sat") or "").upper(),
+                        "descripcion": (item.get("descripcion") or "").upper(),
+                        "clave_unidad": (item.get("clave_unidad") or "").upper(),
+                        "unidad": (item.get("unidad") or "").upper(),
+                        "objeto_imp": (item.get("objeto_imp") or "").upper(),
+                        "id_usuario_creo": idUsuario,
+                        "activo": item.get("activo", True),
+                        "fecha_creacion": fecha_actual,
+                        "fecha_inactivo": fecha_actual if not item.get("activo", True) else None
+                    }
+
+                    resp_prod_serv = db["companias_prod_serv"].insert_one(nuevo_prod_serv)
+                    prod_serv_insertados.append(str(resp_prod_serv.inserted_id))
+
             return {
                 "status": 200,
                 "data": {
@@ -254,6 +327,14 @@ class CompanyHelper():
                         "localField": "_id",
                         "foreignField": "company_id",
                         "as": "bancos"
+                    },
+                },
+                {
+                    "$lookup": {
+                        "from": "companias_prod_serv",
+                        "localField": "_id",
+                        "foreignField": "company_id",
+                        "as": "prod_serv"
                     }
                 },
                 {
@@ -345,6 +426,27 @@ class CompanyHelper():
                             "fecha_inactivo":           CompanyHelper.serialize_datetime(banco.get("fecha_inactivo")),
                         }
                         for banco in compania.get("bancos", [])
+                    ],
+
+                    "prod_serv": [
+                        {
+                            "_id": str(item["_id"]) if item.get("_id") else None,
+                            "company_id": str(item.get("company_id")) if item.get("company_id") else None,
+                            "prod_serv": item.get("prod_serv"),
+                            "descripcion_sat": item.get("descripcion_sat"),
+                            "descripcion": item.get("descripcion"),
+                            "clave_unidad": item.get("clave_unidad"),
+                            "unidad": item.get("unidad"),
+                            "objeto_imp": item.get("objeto_imp"),
+                            "num_uso": item.get("num_uso"),
+                            "id_usuario_creo": str(item.get("id_usuario_creo")) if item.get("id_usuario_creo") else None,
+                            "id_usuario_modifico": str(item.get("id_usuario_modifico")) if item.get("id_usuario_modifico") else None,
+                            "activo": item.get("activo"),
+                            "fecha_creacion": CompanyHelper.serialize_datetime(item.get("fecha_creacion")),
+                            "fecha_actualizacion": CompanyHelper.serialize_datetime(item.get("fecha_actualizacion")),
+                            "fecha_inactivo": CompanyHelper.serialize_datetime(item.get("fecha_inactivo")),
+                        }
+                        for item in compania.get("prod_serv", [])
                     ]
                 }
                 for compania in companias

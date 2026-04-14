@@ -69,3 +69,32 @@ class BankCompanyModel(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         populate_by_name = True
+
+
+
+class ProdServModel(BaseModel):
+
+    company_id: Optional[ObjectId]
+    
+    prod_serv: Optional[str] = None
+    descripcion_sat: Optional[str] = None
+    descripcion: Optional[str] = None
+    clave_unidad: Optional[str] = None
+    unidad: Optional[str] = None
+    objeto_imp: Optional[str] = None
+    num_uso: Optional[int] = 0
+    
+    id_usuario_creo: Optional[str] = None
+    id_usuario_modifico: Optional[str] = None
+    
+    activo: bool = True
+
+    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
+    fecha_actualizacion: Optional[datetime] = None
+    fecha_inactivo: Optional[datetime] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+        populate_by_name = True
+
