@@ -5,6 +5,7 @@ from bson import ObjectId
 from typing import Optional
 from datetime import datetime
 
+
 class CompanyModel(BaseModel):
 
     logo: Optional[str] = None
@@ -46,8 +47,8 @@ class CompanyModel(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         populate_by_name = True
-        
-        
+
+
 class BankCompanyModel(BaseModel):
 
     company_id: Optional[ObjectId]
@@ -69,7 +70,6 @@ class BankCompanyModel(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         populate_by_name = True
-
 
 
 class ProdServModel(BaseModel):

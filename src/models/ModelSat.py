@@ -81,3 +81,44 @@ class SatProductosServiciosModel(BaseModel):
     class Config:
         json_encoders = {ObjectId: str}
         populate_by_name = True
+
+
+
+class SatClavesUnidadesModel(BaseModel):
+
+    clave_unidad: Optional[str] = None
+    descripcion: Optional[str] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        populate_by_name = True
+
+
+class SatClavesUnidadesModel(BaseModel):
+
+    clave_unidad: Optional[str] = None
+    descripcion: Optional[str] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        populate_by_name = True
+
+
+class SatExportacionModel(BaseModel):
+    
+    exportacion: Optional[str] = None
+    descripcion: Optional[str] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        populate_by_name = True
+
+
+class SatObjetoImpModel(BaseModel):
+
+    objeto_imp: Optional[str] = None
+    descripcion: Optional[str] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        populate_by_name = True

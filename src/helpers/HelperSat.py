@@ -1,5 +1,5 @@
 from dataBase.mongo import cnn_mongo
-from models.ModelSat import ( SatPaisModel, SatEstadoModel, SatRegimenFiscalModel, SatTipoPersonaModel, SatBancoModel, SatProductosServiciosModel )
+from models.ModelSat import ( SatPaisModel, SatEstadoModel, SatRegimenFiscalModel, SatTipoPersonaModel, SatBancoModel, SatProductosServiciosModel, SatClavesUnidadesModel, SatExportacionModel, SatObjetoImpModel )
 
 class SatHelper:
 
@@ -13,23 +13,59 @@ class SatHelper:
             sat_tipo_persona                    = list(db["sat_tipo_persona"].find({}, {"_id": 0}))
             sat_regimen_fiscal                  = list(db["sat_regimen_fiscal"].find({}, {"_id": 0}))
             sat_banco                           = list(db["sat_banco"].find({}, {"_id": 0}))
+            sat_clave_unidad                    = list(db["sat_clave_unidad"].find({}, {"_id": 0}))
+            sat_exportacion                     = list(db["sat_exportacion"].find({}, {"_id": 0}))
+            sat_objeto_imp                      = list(db["sat_objeto_imp"].find({}, {"_id": 0}))
 
-            estados                             = [SatEstadoModel(**estado).model_dump() for estado in sat_estado]
-            paises                              = [SatPaisModel(**pais).model_dump() for pais in sat_pais]
-            tipos_persona                       = [SatTipoPersonaModel(**tipo).model_dump() for tipo in sat_tipo_persona]
-            regimenes                           = [SatRegimenFiscalModel(**regimen).model_dump() for regimen in sat_regimen_fiscal]
-            bancos                              = [SatBancoModel(**banco).model_dump() for banco in sat_banco]
+            estados                             = [SatEstadoModel(**item).model_dump() for item in sat_estado]
+            paises                              = [SatPaisModel(**item).model_dump() for item in sat_pais]
+            tipos_persona                       = [SatTipoPersonaModel(**item).model_dump() for item in sat_tipo_persona]
+            regimenes                           = [SatRegimenFiscalModel(**item).model_dump() for item in sat_regimen_fiscal]
+            bancos                              = [SatBancoModel(**item).model_dump() for item in sat_banco]
+            clave_unidad                        = [SatClavesUnidadesModel(**item).model_dump() for item in sat_clave_unidad]
+            exportacion                         = [SatExportacionModel(**exportacion).model_dump() for exportacion in sat_exportacion]
+            objeto_imp                          = [SatObjetoImpModel(**objeto_imp).model_dump() for objeto_imp in sat_objeto_imp]
+
+            clave_unidad = [
+                {
+                    **SatClavesUnidadesModel(**item).model_dump(),
+                    "descripcion_2": f"{item.get('clave_unidad', '')} - {item.get('descripcion', '')}"
+                }
+                for item in sat_clave_unidad
+            ]
+
+
+            exportacion = [
+                {
+                    **SatExportacionModel(**item).model_dump(),
+                    "descripcion_2": f"{item.get('exportacion', '')} - {item.get('descripcion', '')}"
+                }
+                for item in sat_exportacion
+            ]
+
+
+            objeto_imp = [
+                {
+                    **SatObjetoImpModel(**item).model_dump(),
+                    "descripcion_2": f"{item.get('objeto_imp', '')} - {item.get('descripcion', '')}"
+                }
+                for item in sat_objeto_imp
+            ]
+
 
             resultado                           = {
                                                     "status": 200,
                                                     "data": {
                                                         "mensaje": "Consulta correcta!",
                                                         "datos": {
-                                                            "tipo_persona": tipos_persona,
-                                                            "pais": paises,
                                                             "estado": estados,
+                                                            "pais": paises,
+                                                            "tipo_persona": tipos_persona,
                                                             "regimen_fiscal": regimenes,
-                                                            "banco": bancos
+                                                            "banco": bancos,
+                                                            "clave_unidad": clave_unidad,
+                                                            "exportacion": exportacion,
+                                                            "objeto_imp": objeto_imp
                                                         }
                                                     }
                                                 }
@@ -37,6 +73,7 @@ class SatHelper:
             return resultado
 
         except Exception as ex:
+            print( str(ex) )
             return { "status": 500, "data": { "mensaje": str(ex), "datos": {} } }
         
         
@@ -65,8 +102,6 @@ class SatHelper:
                 producto = SatProductosServiciosModel(**item).model_dump()
                 producto["descripcion_mostrar"] = f'{producto["clave_prod_serv"]} - {producto["descripcion"]}'
                 prod_serv.append(producto)
-                
-            print(prod_serv)
 
             resultado = {
                 "status": 200,
